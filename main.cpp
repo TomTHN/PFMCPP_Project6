@@ -58,46 +58,75 @@ Purpose:  This project will show you the difference between member functions and
 #include <string>
 struct T
 {
-    T(<#type name#> v, const char* <#variable name#>)   //1
-    //2
-    //3
+    T(int v, const char* tChar) : value(v), name(tChar) {}  //1
+
+    int value; //2
+    const char* name;//3
 };
 
-struct <#structName1#>                                //4
+struct Operator                                //4
 {
-    <#type name#> compare(<#type name#> a, <#type name#> b) //5
+    T* compare(T* a, T* b) //5
     {
-        if( a->value < b->value ) return a;
-        if( a->value > b->value ) return b;
+        if(a != nullptr && b != nullptr) 
+        {
+            if( a->value < b->value ) return a;
+            if( a->value > b->value ) return b;
+        }
+        
         return nullptr;
     }
 };
 
 struct U
 {
-    float <#name1#> { 0 }, <#name2#> { 0 };
-    <#returnType#> <#memberFunction#>(<#type name#>* <#updatedValue#>)      //12
+    float valueUOne { 0 }, valueUTwo { 0 };
+    // no THIS keyword necessary because member function so it is implicit 
+    float updateValue(float* newValue)      //12
     {
+        if(newValue != nullptr)
+        {
+            std::cout << "U's valueUOne value: " << valueUOne << std::endl;
+            valueUOne = *newValue;
+            std::cout << "U's valueUOne updated value: " << valueUOne << std::endl;
+            
+            while( std::abs(valueUTwo - valueUOne) > 0.001f )
+            {
+                /*
+                write something that makes the distance between that-><#name2#> and that-><#name1#> get smaller
+                */
+                valueUTwo += (valueUOne < valueUTwo) ? -0.1f : 0.1f;    //so the while loop is not necessary
+            }
+            
+            std::cout << "U's valueUTwo updated value: " << valueUTwo << std::endl; 
+        }
         
+        return valueUTwo * valueUOne;
     }
 };
 
-struct <#structname2#>
+struct UpdateWithThat
 {
-    static <#returntype#> <#staticFunctionA#>(U* that, <#type name#>* <#updatedValue#> )        //10
+    static float updateValue(U* that, float* newValue)        //10
     {
-        std::cout << "U's <#name1#> value: " << that-><#name1#> << std::endl;
-        that-><#name1#> = <#updatedValue#>;
-        std::cout << "U's <#name1#> updated value: " << that-><#name1#> << std::endl;
-        while( std::abs(that-><#name2#> - that-><#name1#>) > 0.001f )
+        if(that != nullptr && newValue != nullptr)
         {
-            /*
-             write something that makes the distance between that-><#name2#> and that-><#name1#> get smaller
-             */
-            that-><#name2#> += ;
+            std::cout << "U's valueUOne value: " << that->valueUOne << std::endl;
+            that->valueUOne = *newValue;
+            std::cout << "U's valueUOne updated value: " << that->valueUOne << std::endl;
+            
+            while( std::abs(that->valueUTwo - that->valueUOne) > 0.001f )
+            {
+                /*
+                 write something that makes the distance between that-><#name2#> and that-><#name1#> get smaller
+                 */
+                that->valueUTwo += (that->valueUOne < that->valueUTwo) ? -0.1f : 0.1f; 
+            }
+            
+            std::cout << "U's valueUTwo updated value: " << that->valueUTwo << std::endl; 
         }
-        std::cout << "U's <#name2#> updated value: " << that-><#name2#> << std::endl;
-        return that-><#name2#> * that-><#name1#>;
+        
+        return that->valueUTwo * that->valueUOne;
     }
 };
         
@@ -117,17 +146,26 @@ struct <#structname2#>
 
 int main()
 {
-    T <#name1#>( , );                                             //6
-    T <#name2#>( , );                                             //6
+    T tOne(5,"tOne");                                             //6
+    T tTwo(3,"tTwo");                                             //6
     
-    <#structName1#> f;                                            //7
-    auto* smaller = f.compare( , );                              //8
-    std::cout << "the smaller one is << " << smaller->name << std::endl; //9
+    Operator f;                                            //7
+    auto* smaller = f.compare(&tOne, &tTwo);    //8
     
-    U <#name3#>;
+    if(smaller != nullptr)
+    {
+        std::cout << "the smaller one is " << smaller->name << std::endl; //9
+    }
+    else
+    {
+        std::cout << "Reasons for nullptr:" << std::endl << "1. tOne or tTwo is nullptr" << std::endl << "tOne tTwo same value" << std::endl; //9
+    }
+    
+    U uOne;
     float updatedValue = 5.f;
-    std::cout << "[static func] <#name3#>'s multiplied values: " << <#structname2#>::<#staticFunctionA#>( , ) << std::endl;                  //11
     
-    U <#name4#>;
-    std::cout << "[member func] <#name4#>'s multiplied values: " << <#name4#>.<#memberFunction#>( &updatedValue ) << std::endl;
+    std::cout << "[static func] uOne's multiplied values: " << UpdateWithThat::updateValue(&uOne, &updatedValue) << std::endl;                  //11
+    
+    U uTwo;
+    std::cout << "[member func] uTwo's multiplied values: " << uTwo.updateValue( &updatedValue ) << std::endl;
 }
