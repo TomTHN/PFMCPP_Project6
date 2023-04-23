@@ -59,6 +59,7 @@ Purpose:  This project will show you the difference between member functions and
 struct T
 {
     T(int v, const char* tChar) : value(v), name(tChar) {}  //1
+
     int value; //2
     const char* name;//3
 };
@@ -72,35 +73,60 @@ struct Operator                                //4
             if( a->value < b->value ) return a;
             if( a->value > b->value ) return b;
         }
+        
         return nullptr;
     }
 };
 
 struct U
 {
-    float uOne { 0 }, uTwo { 0 };
-    U* updateValue(U* newValue)      //12
+    float valueUOne { 0 }, valueUTwo { 0 };
+    // no THIS keyword necessary because member function so it is implicit 
+    float updateValue(float* newValue)      //12
     {
+        if(newValue != nullptr)
+        {
+            std::cout << "U's valueUOne value: " << valueUOne << std::endl;
+            valueUOne = *newValue;
+            std::cout << "U's valueUOne updated value: " << valueUOne << std::endl;
+            
+            while( std::abs(valueUTwo - valueUOne) > 0.001f )
+            {
+                /*
+                write something that makes the distance between that-><#name2#> and that-><#name1#> get smaller
+                */
+                valueUTwo += (valueUOne < valueUTwo) ? -0.1f : 0.1f;    //so the while loop is not necessary
+            }
+            
+            std::cout << "U's valueUTwo updated value: " << valueUTwo << std::endl; 
+        }
         
+        return valueUTwo * valueUOne;
     }
 };
 
 struct UpdateWithThat
 {
-    static float updateValue(U* that, U* newValue)        //10
+    static float updateValue(U* that, float* newValue)        //10
     {
-        std::cout << "U's uOne value: " << that->uOne << std::endl;
-        that->uOne = *newValue;
-        std::cout << "U's uOne updated value: " << that->uOne << std::endl;
-        while( std::abs(that->uTwo - that->uOne) > 0.001f )
+        if(that != nullptr && newValue != nullptr)
         {
-            /*
-             write something that makes the distance between that-><#name2#> and that-><#name1#> get smaller
-             */
-            that->uTwo += that->uOne - that->uTwo;    //so the While loop is not nesseccery
+            std::cout << "U's valueUOne value: " << that->valueUOne << std::endl;
+            that->valueUOne = *newValue;
+            std::cout << "U's valueUOne updated value: " << that->valueUOne << std::endl;
+            
+            while( std::abs(that->valueUTwo - that->valueUOne) > 0.001f )
+            {
+                /*
+                 write something that makes the distance between that-><#name2#> and that-><#name1#> get smaller
+                 */
+                that->valueUTwo += (that->valueUOne < that->valueUTwo) ? -0.1f : 0.1f; 
+            }
+            
+            std::cout << "U's valueUTwo updated value: " << that->valueUTwo << std::endl; 
         }
-        std::cout << "U's uTwo updated value: " << that->uTwo << std::endl;
-        return that->uTwo * that->uOne; //should be squared
+        
+        return that->valueUTwo * that->valueUOne;
     }
 };
         
@@ -124,11 +150,11 @@ int main()
     T tTwo(3,"tTwo");                                             //6
     
     Operator f;                                            //7
-    auto* smaller = f.compare(tOne, tTwo);    //8
+    auto* smaller = f.compare(&tOne, &tTwo);    //8
     
     if(smaller != nullptr)
     {
-        std::cout << "the smaller one is << " << smaller->name << std::endl; //9
+        std::cout << "the smaller one is " << smaller->name << std::endl; //9
     }
     else
     {
@@ -137,8 +163,9 @@ int main()
     
     U uOne;
     float updatedValue = 5.f;
-    std::cout << "[static func] <#name3#>'s multiplied values: " << <#structname2#>::<#staticFunctionA#>( , ) << std::endl;                  //11
     
-    U <#name4#>;
-    std::cout << "[member func] <#name4#>'s multiplied values: " << <#name4#>.<#memberFunction#>( &updatedValue ) << std::endl;
+    std::cout << "[static func] uOne's multiplied values: " << UpdateWithThat::updateValue(&uOne, &updatedValue) << std::endl;                  //11
+    
+    U uTwo;
+    std::cout << "[member func] uTwo's multiplied values: " << uTwo.updateValue( &updatedValue ) << std::endl;
 }
