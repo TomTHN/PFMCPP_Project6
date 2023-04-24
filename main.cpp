@@ -37,14 +37,10 @@ struct T
 
 struct Operator                                //4
 {
-    T* compare(T* a, T* b) //5
+    T* compare(T& a, T& b) //5
     {
-        if(a != nullptr && b != nullptr) 
-        {
-            if( a->value < b->value ) return a;
-            if( a->value > b->value ) return b;
-        }
-        
+        if( a.value < b.value ) return &a;
+        if( a.value > b.value ) return &b;
         return nullptr;
     }
 };
@@ -53,51 +49,43 @@ struct U
 {
     float valueUOne { 0 }, valueUTwo { 0 };
     // no THIS keyword necessary because member function so it is implicit 
-    float updateValue(float* newValue)      //12
+    float updateValue(float& newValue)      //12
     {
-        if(newValue != nullptr)
+        std::cout << "U's valueUOne value: " << valueUOne << std::endl;
+        valueUOne = newValue;
+        std::cout << "U's valueUOne updated value: " << valueUOne << std::endl;
+            
+        while( std::abs(valueUTwo - valueUOne) > 0.001f )
         {
-            std::cout << "U's valueUOne value: " << valueUOne << std::endl;
-            valueUOne = *newValue;
-            std::cout << "U's valueUOne updated value: " << valueUOne << std::endl;
-            
-            while( std::abs(valueUTwo - valueUOne) > 0.001f )
-            {
-                /*
-                write something that makes the distance between that-><#name2#> and that-><#name1#> get smaller
-                */
-                valueUTwo += (valueUOne < valueUTwo) ? -0.1f : 0.1f;    //so the while loop is not necessary
-            }
-            
-            std::cout << "U's valueUTwo updated value: " << valueUTwo << std::endl; 
+            /*
+            write something that makes the distance between that-><#name2#> and that-><#name1#> get smaller
+            */
+            valueUTwo += (valueUOne < valueUTwo) ? -0.1f : 0.1f;    //so the while loop is not necessary
         }
-        
+            
+        std::cout << "U's valueUTwo updated value: " << valueUTwo << std::endl;     
         return valueUTwo * valueUOne;
     }
 };
 
 struct UpdateWithThat
 {
-    static float updateValue(U* that, float* newValue)        //10
+    static float updateValue(U& that, float& newValue)        //10
     {
-        if(that != nullptr && newValue != nullptr)
+        std::cout << "U's valueUOne value: " << that.valueUOne << std::endl;
+        that.valueUOne = newValue;
+        std::cout << "U's valueUOne updated value: " << that.valueUOne << std::endl;
+            
+        while( std::abs(that.valueUTwo - that.valueUOne) > 0.001f )
         {
-            std::cout << "U's valueUOne value: " << that->valueUOne << std::endl;
-            that->valueUOne = *newValue;
-            std::cout << "U's valueUOne updated value: " << that->valueUOne << std::endl;
-            
-            while( std::abs(that->valueUTwo - that->valueUOne) > 0.001f )
-            {
-                /*
-                 write something that makes the distance between that-><#name2#> and that-><#name1#> get smaller
-                 */
-                that->valueUTwo += (that->valueUOne < that->valueUTwo) ? -0.1f : 0.1f; 
-            }
-            
-            std::cout << "U's valueUTwo updated value: " << that->valueUTwo << std::endl; 
+            /*
+            write something that makes the distance between that-><#name2#> and that-><#name1#> get smaller
+            */
+            that.valueUTwo += (that.valueUOne < that.valueUTwo) ? -0.1f : 0.1f; 
         }
-        
-        return that->valueUTwo * that->valueUOne;
+            
+        std::cout << "U's valueUTwo updated value: " << that.valueUTwo << std::endl; 
+        return that.valueUTwo * that.valueUOne;
     }
 };
         
@@ -121,7 +109,7 @@ int main()
     T tTwo(3,"tTwo");                                             //6
     
     Operator f;                                            //7
-    auto* smaller = f.compare(&tOne, &tTwo);    //8
+    auto* smaller = f.compare(tOne, tTwo);    //8
     
     if(smaller != nullptr)
     {
@@ -129,14 +117,14 @@ int main()
     }
     else
     {
-        std::cout << "Reasons for nullptr:" << std::endl << "1. tOne or tTwo is nullptr" << std::endl << "tOne tTwo same value" << std::endl; //9
+        std::cout << "Reasons for nullptr:" << std::endl  << "tOne tTwo same value" << std::endl; //9
     }
     
     U uOne;
     float updatedValue = 5.f;
     
-    std::cout << "[static func] uOne's multiplied values: " << UpdateWithThat::updateValue(&uOne, &updatedValue) << std::endl;                  //11
+    std::cout << "[static func] uOne's multiplied values: " << UpdateWithThat::updateValue(uOne, updatedValue) << std::endl;                  //11
     
     U uTwo;
-    std::cout << "[member func] uTwo's multiplied values: " << uTwo.updateValue( &updatedValue ) << std::endl;
+    std::cout << "[member func] uTwo's multiplied values: " << uTwo.updateValue( updatedValue ) << std::endl;
 }
